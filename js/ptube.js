@@ -1,3 +1,8 @@
+const blogPage = () => {
+    window.location.href="blog.html";
+}
+
+
 const catagoryHandler = async () => {
   const res = await fetch(
     "https://openapi.programming-hero.com/api/videos/categories"
@@ -30,18 +35,25 @@ const handleCatagoryItem = async (catagoryId, wantToSort) => {
   if (mainData2.length != 0) {
     const cardContainer = document.getElementById("card-container");
     cardContainer.textContent = "";
-    cardContainer.classList = "grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4";
+    cardContainer.classList = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
     if(wantToSort){
         mainData2.sort((a,b)=> parseInt(b.others.views.slice(0, b.others.views.length - 1)) - parseInt(a.others.views.slice(0, a.others.views.length - 1)))
         console.log(mainData2)
     }
     mainData2.forEach((item) => {
-      // console.log(item.others.views);
+    //   console.log(item.others.posted_date);
       const div = document.createElement("div");
+      const hours = Math.floor(item.others.posted_date/3600);
+      const minutes = Math.floor((item.others.posted_date%3600)/60);
       div.innerHTML = `
-    <div class="card w-64 h-64 bg-base-100 shadow-xl mt-7">
+    <div class="card w-64 h-64 bg-base-100 shadow-xl mt-7 mx-auto">
   <figure class="w-full h-36">
-    <img src="${item?.thumbnail}" alt="Shoes" class="rounded-xl" />
+    <img class="relative" src="${item?.thumbnail}" alt="Shoes" class="rounded-xl" />
+    <button id="something" class="absolute right-3 top-28 bg-black rounded-md text-xs text-white px-2 py-1">${
+        item.others.posted_date
+          ? hours+"hrs "+minutes+" min ago"
+          :''
+      }</button>
   </figure>
   <div class="flex item-center gap-3 mt-4">
         <div>
@@ -63,6 +75,7 @@ const handleCatagoryItem = async (catagoryId, wantToSort) => {
         </div>
   </div>
 </div>
+
     `;
 
       cardContainer.appendChild(div);
@@ -70,12 +83,12 @@ const handleCatagoryItem = async (catagoryId, wantToSort) => {
   } else {
     const cardContainer = document.getElementById("card-container");
     cardContainer.textContent = "";
-    cardContainer.classList = "flex justify-center";
+    cardContainer.classList = "flex justify-center item-center h-screen";
     const div = document.createElement("div");
     cardContainer.innerHTML = `
-    <div class="mt-32">
+    <div class="my-auto">
      <img class="mx-auto" src="./Icon.png" alt="Centered Image">
-     <p class="text-center"> Oops!! Sorry, There is no <br>content here </p>
+     <p class="text-center text-2xl"><b> Oops!! Sorry, There is no <br>content here</b></p>
     </div>
     `;
     // cardContainer.appendChild(div);
