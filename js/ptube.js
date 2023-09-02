@@ -1,7 +1,15 @@
 const blogPage = () => {
-    window.location.href="blog.html";
-}
+  window.location.href = "blog.html";
+};
 
+
+
+let currentCatagory = 1000;
+
+const sortByView = () => {
+  handleCatagoryItem(currentCatagory,true);
+  console.log(currentCatagory);
+}
 
 const catagoryHandler = async () => {
   const res = await fetch(
@@ -14,11 +22,17 @@ const catagoryHandler = async () => {
 
 const displayData = (mainData) => {
   const catagoryContainer = document.getElementById("catagory-container");
+  catagoryContainer.innerHTML = "";
   mainData.forEach((catagory) => {
     const div = document.createElement("div");
+    // console.log(typeof catagory.category_id);
     div.innerHTML = `
         <div class="tabs">
-            <a onclick="handleCatagoryItem(${catagory.category_id},${false})" class="tab border border-b-gray-100 ">${catagory.category}</a> 
+            <a onclick="handleCatagoryItem(${
+              catagory.category_id
+            },${false})" class="tab border border-b-gray-100 ${
+      catagory.category_id == currentCatagory ? "bg-red-600 text-white" : ""
+    }">${catagory.category}</a> 
         </div>
         `;
     catagoryContainer.appendChild(div);
@@ -27,6 +41,8 @@ const displayData = (mainData) => {
 
 const handleCatagoryItem = async (catagoryId, wantToSort) => {
   // console.log(catagoryId);
+  currentCatagory = catagoryId;
+  catagoryHandler();
   const res = await fetch(
     `https://openapi.programming-hero.com/api/videos/category/${catagoryId}`
   );
@@ -34,25 +50,33 @@ const handleCatagoryItem = async (catagoryId, wantToSort) => {
   const mainData2 = data.data;
   if (mainData2.length != 0) {
     const cardContainer = document.getElementById("card-container");
+    // console.log(cardContainer.textContent)
     cardContainer.textContent = "";
+    
     cardContainer.classList = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4";
-    if(wantToSort){
-        mainData2.sort((a,b)=> parseInt(b.others.views.slice(0, b.others.views.length - 1)) - parseInt(a.others.views.slice(0, a.others.views.length - 1)))
-        console.log(mainData2)
+    if (wantToSort) {
+      mainData2.sort(
+        (a, b) =>
+          parseInt(b.others.views.slice(0, b.others.views.length - 1)) -
+          parseInt(a.others.views.slice(0, a.others.views.length - 1))
+      );
+      // console.log(mainData2)
     }
     mainData2.forEach((item) => {
-    //   console.log(item.others.posted_date);
+      //   console.log(item.others.posted_date);
       const div = document.createElement("div");
-      const hours = Math.floor(item.others.posted_date/3600);
-      const minutes = Math.floor((item.others.posted_date%3600)/60);
+      const hours = Math.floor(item.others.posted_date / 3600);
+      const minutes = Math.floor((item.others.posted_date % 3600) / 60);
       div.innerHTML = `
     <div class="card w-64 h-64 bg-base-100 shadow-xl mt-7 mx-auto">
   <figure class="w-full h-36">
-    <img class="relative" src="${item?.thumbnail}" alt="Shoes" class="rounded-xl" />
-    <button id="something" class="absolute right-3 top-28 bg-black rounded-md text-xs text-white px-2 py-1">${
-        item.others.posted_date
-          ? hours+"hrs "+minutes+" min ago"
-          :''
+    <img class="relative" src="${
+      item?.thumbnail
+    }" alt="Shoes" class="rounded-xl" />
+    <button id="something" class="absolute right-3 top-28 bg-black rounded-md text-xs text-white ${
+      item.others.posted_date ? "px-2 py-1" : ""
+    }">${
+        item.others.posted_date ? hours + "hrs " + minutes + " min ago" : ""
       }</button>
   </figure>
   <div class="flex item-center gap-3 mt-4">
@@ -93,6 +117,5 @@ const handleCatagoryItem = async (catagoryId, wantToSort) => {
     `;
     // cardContainer.appendChild(div);
   }
-}
-handleCatagoryItem(1000, false);
-catagoryHandler();
+};
+handleCatagoryItem(currentCatagory, false);
